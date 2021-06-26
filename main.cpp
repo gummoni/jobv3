@@ -12,6 +12,9 @@ private:
 
 protected:
 
+	/// <summary>
+	/// åªç›ÇÃÉWÉáÉuÇãxé~
+	/// </summary>
 	void suspend() {
 		is_finished = false;
 	}
@@ -37,10 +40,8 @@ public:
 	/// </summary>
 	/// <param name="jobs"></param>
 	void action(job** jobs) {
-		while (NULL != *jobs) {
-			action(*jobs);
-			jobs++;
-		}
+		while (NULL != *jobs)
+			action(*(jobs++));
 	}
 
 	/// <summary>
@@ -62,10 +63,8 @@ public:
 	/// </summary>
 	/// <param name="jobs"></param>
 	void fork(job** jobs) {
-		while (NULL != *jobs) {
-			fork(*jobs);
-			jobs++;
-		}
+		while (NULL != *jobs)
+			fork(*(jobs++));
 	}
 
 	/// <summary>
@@ -140,7 +139,6 @@ int main(void) {
 
 	auto j = new job1(-10, "A");
 	auto l = new job1(0, "C");
-
 	job* k = new job1(0, "B");
 	j->fork(k);
 	j->action(l);
