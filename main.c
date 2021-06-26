@@ -2,7 +2,6 @@
 #include "job.h"
 
 
-
 typedef struct {
 	job token;
 	int count;
@@ -57,10 +56,8 @@ int main(void) {
 	fork(&t2.token, &t3.token);
 	fork(&t1.token, &t2.token);
 	action(&t1.token, &t4.token);
-
-	job* exe = &t1.token;
-	while (NULL != exe)
-		exe = dispatch(exe);
-
+	
+	for (job* exe = &t1.token; NULL != exe; exe = dispatch(exe));
+		
 	return 1;
 }

@@ -1,5 +1,4 @@
 #pragma once
-#include <stdio.h>
 
 #define JOB_STATE_START		(0)
 #define JOB_STATE_BUSY		(1)
@@ -18,11 +17,28 @@ typedef struct job {
 
 #define suspend(self) { ((job*)self)->errno = JOB_STATE_BUSY; }
 
-extern job* fork_last(job* self);
-extern void fork(job* self, job* item);
-extern void forks(job* self, job** items);
-extern job* action_last(job* self);
-extern void action(job* self, job* item);
-extern void actions(job* self, job** items);
+#define fork_last(self, item) {										\
+	for (job* __chk = self; ; __chk = __chk->fork_next) {			\
+		if (self == __chk->fork_next) {								\
+			__chk->fork_next = item;								\
+			break;													\
+		}															\
+	}																\
+}
+
+#define fork(self, item) {	fork_last(self, item);	fork_last(item, self);	}
+
+#define action(self, item) {										\
+	for (job* __chk = self; ; __chk = __chk->action_next) {			\
+		if (NULL == __chk->action_next) {							\
+			__chk->action_next = item;								\
+			break;													\
+		}															\
+	}																\
+}
+
+#define wait(self, cur) {											\
+	for (; JOB_STATE_FINISH <= self->errno; cur = dispatch(cur));	\
+}
+
 extern job* dispatch(job* self);
-extern void wait(job* self, job* cur);
