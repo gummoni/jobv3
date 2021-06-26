@@ -92,12 +92,12 @@ public:
 		is_finished = true;
 		func();
 
-		//完了したら直列シーケンス実行
+		//完了したら直列シーケンスを並列シーケンスに登録
 		if (is_finished)
 			if (NULL != action_next)
 				fork(action_next);
 
-		//次の並列シーケンス実行
+		//次に実行する並列シーケンスを返す
 		for (; fork_next->is_finished; fork_next = fork_next->fork_next)
 			if (this == fork_next)
 				return NULL;
@@ -106,7 +106,7 @@ public:
 	}
 };
 
-
+//10までカウントアップして終えるジョブ
 class job1 : public job {
 	int count = 0;
 	const char* header;
@@ -135,6 +135,11 @@ public:
 	}
 };
 
+/// <summary>
+/// メイン処理
+/// </summary>
+/// <param name=""></param>
+/// <returns></returns>
 int main(void) {
 
 	auto j = new job1(-10, "A");
@@ -143,11 +148,12 @@ int main(void) {
 	j->fork(k);
 	j->action(l);
 
-	//k->wait(c);
+	//全て完了するまで待つ場合
+	job* x = j;
+	while (NULL != x)
+		x = x->dispatch();
 
-	//while (NULL != c)
-	//	c = c->dispatch();
-
+	//特定のジョブ完了するまで待つ場合
 	//j->wait();
 	l->wait(j);
 
